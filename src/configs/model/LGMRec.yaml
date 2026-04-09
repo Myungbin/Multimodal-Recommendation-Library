@@ -7,10 +7,10 @@ cf_model: 'lightgcn'
 n_mm_layers: 2
 n_ui_layers: 3
 n_hyper_layer: 1
-hyper_num: 64
-keep_rate: 0.8
-alpha: 0.1
-cl_weight: 0.1
-reg_weight: [0.01, 0.1, 1.0]
+hyper_num: [4, 16, 64]
+keep_rate: [0.2, 0.4, 0.6, 0.8]
+alpha: [0.1, 0.2, 0.3, 0.4]
+cl_weight: [0.1, 0.2, 0.3, 0.4, 0.5]
+reg_weight: [1e-06]
 
-hyper_parameters: ["reg_weight"]
+hyper_parameters: ["reg_weight", "hyper_num", "cl_weight", "keep_rate", "alpha"]

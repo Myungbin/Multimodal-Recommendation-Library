@@ -2,8 +2,9 @@
 # @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
 
 embedding_size: 64
-latent_embedding: 16
-n_layers: [2, 3]
-reg_weight: [0.01, 0.1, 1.0]
+latent_embedding: 64
+n_layers: [1, 2, 3]
+reg_weight: [0.1, 0.01, 0.001, 0.0001]
+learning_rate: [0.001, 0.0001]
 
-hyper_parameters: ["n_layers", "reg_weight"]
+hyper_parameters: ["n_layers", "reg_weight", "learning_rate"]
