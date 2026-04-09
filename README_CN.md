@@ -65,7 +65,7 @@ MRLib 是一个面向科研的开源多模态推荐系统（Multimodal Recommend
 | 18 | **COHESION** | COHESION: Composite Graph Convolutional Network with Dual-Stage Fusion for Multimodal Recommendation | SIGIR | 2025 | [link](https://arxiv.org/pdf/2504.04452) |
 | 19 | **SSR** | Structured Spectral Reasoning for Frequency-Adaptive Multimodal Recommendation | NeurIPS | 2025 | [link](https://arxiv.org/pdf/2512.01372) |
 | 20 | **HPMRec** | Hypercomplex Prompt-aware Multimodal Recommendation | CIKM | 2025 | [link](https://arxiv.org/pdf/2508.10753) |
-| 21 | **LOBSTER** | LOBSTER: Bilateral global semantic enhancement for multimedia recommendation | 2026 | [link](https://www.sciencedirect.com/science/article/pii/S1566253525008401) |
+| 21 | **LOBSTER** | LOBSTER: Bilateral global semantic enhancement for multimedia recommendation | Information Fusion | 2026 | [link](https://www.sciencedirect.com/science/article/pii/S1566253525008401) |
 
 > 模型列表按发表年份排序，将持续同步最新研究成果。
 
@@ -239,8 +239,7 @@ visualizer.save_plots()
 
 ## 📝 引用
 
-如果您在学术研究中使用 MRLib，请引用我们的综述论文：  
-**[TMM2026] A survey on multimodal recommender systems: Recent advances and future directions**
+如果您在学术研究中使用 MRLib，请引用我们的综述论文 [[TMM2026] MRS Survey](https://github.com/Jinfeng-Xu/Awesome-Multimodal-Recommender-Systems)
 
 ```bibtex
 @article{xu2026survey,

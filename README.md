@@ -66,7 +66,7 @@
 | 18 | **COHESION** | COHESION: Composite Graph Convolutional Network with Dual-Stage Fusion for Multimodal Recommendation | SIGIR | 2025 | [link](https://arxiv.org/pdf/2504.04452) |
 | 19 | **SSR** | Structured Spectral Reasoning for Frequency-Adaptive Multimodal Recommendation | NeurIPS | 2025 | [link](https://arxiv.org/pdf/2512.01372) |
 | 20 | **HPMRec** | Hypercomplex Prompt-aware Multimodal Recommendation | CIKM | 2025 | [link](https://arxiv.org/pdf/2508.10753) |
-| 21 | **LOBSTER** | LOBSTER: Bilateral global semantic enhancement for multimedia recommendation | 2026 | [link](https://www.sciencedirect.com/science/article/pii/S1566253525008401) |
+| 21 | **LOBSTER** | LOBSTER: Bilateral global semantic enhancement for multimedia recommendation | Information Fusion | 2026 | [link](https://www.sciencedirect.com/science/article/pii/S1566253525008401) |
 
 *Models sorted by publication year. Table continuously updated with latest research.*
 
@@ -274,7 +274,7 @@ If you want to add your model to MRLib, please
 
 ## 📝 Citation
 
-If you use MRS in your research, please cite our survey [[TMM2026] MRS Survey](https://github.com/Jinfeng-Xu/Awesome-Multimodal-Recommender-Systems) :
+If you use MRS in your research, please cite our survey [[TMM2026] MRS Survey](https://github.com/Jinfeng-Xu/Awesome-Multimodal-Recommender-Systems)
 
 ```bibtex
 @article{xu2026survey,
