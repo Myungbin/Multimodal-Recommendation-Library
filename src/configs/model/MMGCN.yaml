@@ -1,4 +1,6 @@
-# MRS Framework - MMGCN Model Configuration
+# coding: utf-8
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 embedding_size: 64
 n_layers: [2, 3]
 reg_weight: [0.01, 0.1, 1.0]

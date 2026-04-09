@@ -1,10 +1,5 @@
 # coding: utf-8
-"""
-Training visualization工具（改进版）
-- save到 log/{model}/{dataset}/visualization/
-- 只更新最佳结果
-- Loss 曲线和指标曲线
-"""
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
 
 import os
 import matplotlib.pyplot as plt
@@ -13,49 +8,49 @@ from typing import Dict, List, Optional
 
 
 class TrainingVisualizer:
-    """训练过程可视化器 - 记录全局超parameter搜索的最佳结果"""
+    """Training process visualizer - tracks global best results across hyperparameter search"""
     
     def __init__(self, config, save_dir: str = None):
         self.config = config
         self.enabled = config.get('enable_visualization', False)
         
-        # save到 log/{model}/{dataset}/visualization/
+        # Save to log/{model}/{dataset}/visualization/
         if save_dir is None:
             log_dir = os.path.join('./log', config['model'], config['dataset'])
             self.save_dir = os.path.join(log_dir, 'visualization')
         else:
             self.save_dir = save_dir
         
-        # 创建save目录
+        # Create save directory
         if self.enabled and not os.path.exists(self.save_dir):
             os.makedirs(self.save_dir)
         
-        # 存储当前训练的历史
+        # Store training history for current run
         self.history = {
             'train_loss': [],
             'valid_metrics': {},
             'test_metrics': {}
         }
         
-        # 当前训练的最佳结果
+        # Best results for current training run
         self.best_valid_score = -1
         self.best_epoch = -1
         self.best_valid_result = None
         self.best_test_result = None
         
-        # 全局超parameter搜索的最佳结果（跨所有configuration）
+        # Global best results across all hyperparameter configurations
         self.global_best_valid_score = -1
         self.global_best_valid_result = None
         self.global_best_test_result = None
         self.global_best_params = None
         
-        # configuration
+        # Configuration
         self.plot_style = config.get('plot_style', 'seaborn-v0_8')
         self.dpi = config.get('plot_dpi', 150)
         self.fig_size = config.get('plot_figsize', (10, 6))
         
     def record_loss(self, epoch: int, loss: float):
-        """记录训练损失"""
+        """Record training loss"""
         if not self.enabled:
             return
             
@@ -65,22 +60,22 @@ class TrainingVisualizer:
         })
     
     def record_metrics(self, epoch: int, valid_result: Dict, test_result: Optional[Dict] = None):
-        """记录评估指标并更新当前训练的最佳结果"""
+        """Record evaluation metrics and update best results for current training run"""
         if not self.enabled:
             return
         
-        # 获取验证分数
+        # Get validation score
         valid_metric = self.config.get('valid_metric', 'Recall@20').lower()
         valid_score = valid_result.get(valid_metric, 0.0)
         
-        # 记录当前 epoch 的结果
+        # Record results for current epoch
         self.history['valid_metrics'][epoch] = {
             'valid': valid_result,
             'test': test_result,
             'score': valid_score
         }
         
-        # 更新当前训练的最佳结果
+        # Update best results for current training run
         valid_metric_bigger = self.config.get('valid_metric_bigger', True)
         
         is_better = False
@@ -99,14 +94,14 @@ class TrainingVisualizer:
     
     def update_global_best(self, valid_result: Dict, test_result: Optional[Dict], 
                           hyper_params: tuple):
-        """更新全局超parameter搜索的最佳结果"""
+        """Update global best results across hyperparameter search"""
         if not self.enabled:
             return
         
         valid_metric = self.config.get('valid_metric', 'Recall@20').lower()
         valid_score = valid_result.get(valid_metric, 0.0)
         
-        # 更新全局最佳
+        # Update global best
         valid_metric_bigger = self.config.get('valid_metric_bigger', True)
         
         is_better = False
@@ -121,33 +116,33 @@ class TrainingVisualizer:
             self.global_best_test_result = test_result
             self.global_best_params = hyper_params
             
-            # save全局最佳结果的可视化
+            # Save visualizations for global best results
             self._save_global_best_plots(valid_result, test_result, hyper_params)
     
     def _save_best_plots(self, epoch: int, valid_result: Dict, test_result: Optional[Dict]):
-        """save当前训练最佳结果的图表（仅用于中间过程）"""
-        pass  # 不再save单个训练的最佳，只save全局最佳
+        """Save charts for best results of current training run (intermediate process only)"""
+        pass  # No longer save individual run best, only save global best
     
     def _save_global_best_plots(self, valid_result: Dict, test_result: Optional[Dict], 
                                hyper_params: tuple):
-        """save全局超parameter搜索最佳结果的图表（覆盖旧文件）"""
+        """Save charts for global best results across hyperparameter search (overwrites old files)"""
         if not self.enabled:
             return
         
-        # 基础文件名
+        # Base filename
         base_filename = f'{self.config["model"]}_{self.config["dataset"]}'
         
-        # 1. save全局最佳 Loss 曲线（使用当前训练的历史）
+        # 1. Save global best loss curve (using history from current training run)
         self._plot_loss_curve_global(f'{base_filename}_loss_best.png')
         
-        # 2. save全局最佳指标曲线
+        # 2. Save global best metrics curve
         self._plot_metrics_curve_global(f'{base_filename}_metrics_best.png', valid_result, test_result)
         
-        # 3. save全局最佳结果摘要
+        # 3. Save global best results summary
         self._save_global_best_summary(valid_result, test_result, hyper_params)
     
     def _plot_loss_curve_global(self, filename: str):
-        """绘制并save全局最佳 Loss 曲线（当前超parameter的完整历史）"""
+        """Plot and save global best loss curve (complete history for current hyperparameter)"""
         if len(self.history['train_loss']) == 0:
             return
         
@@ -157,7 +152,7 @@ class TrainingVisualizer:
         plt.figure(figsize=self.fig_size, dpi=self.dpi)
         plt.plot(epochs, losses, 'b-', linewidth=2, marker='o', markersize=3)
         
-        # 标记最佳 epoch
+        # Mark best epoch
         if self.best_epoch >= 0 and self.best_epoch < len(losses):
             plt.axvline(x=self.best_epoch, color='r', linestyle='--', linewidth=2, 
                        label=f'Best Epoch {self.best_epoch + 1}')
@@ -175,11 +170,11 @@ class TrainingVisualizer:
         plt.close()
     
     def _plot_metrics_curve_global(self, filename: str, valid_result: Dict, test_result: Optional[Dict]):
-        """绘制并save全局最佳指标曲线"""
+        """Plot and save global best metrics curve"""
         if len(self.history['valid_metrics']) == 0:
             return
         
-        # 准备数据
+        # Prepare data
         epochs = []
         valid_scores = []
         test_scores = []
@@ -189,13 +184,13 @@ class TrainingVisualizer:
             valid_scores.append(data['score'])
             test_scores.append(data['test'].get(self.config.get('valid_metric', 'Recall@20').lower(), 0.0) if data['test'] else 0.0)
         
-        # 绘制曲线
+        # Plot curves
         fig, ax = plt.subplots(figsize=self.fig_size, dpi=self.dpi)
         
         ax.plot(epochs, valid_scores, 'b-', linewidth=2, marker='s', markersize=4, label='Valid')
         ax.plot(epochs, test_scores, 'r-', linewidth=2, marker='o', markersize=4, label='Test')
         
-        # 标记最佳点
+        # Mark best point
         if self.best_epoch >= 0:
             ax.axvline(x=self.best_epoch, color='g', linestyle='--', linewidth=2, 
                       label=f'Best Epoch {self.best_epoch + 1}')
@@ -213,7 +208,7 @@ class TrainingVisualizer:
     
     def _save_global_best_summary(self, valid_result: Dict, test_result: Optional[Dict], 
                                  hyper_params: tuple):
-        """save全局超parameter搜索最佳结果摘要"""
+        """Save summary of global best results across hyperparameter search"""
         import json
         
         summary = {
@@ -227,7 +222,7 @@ class TrainingVisualizer:
             'best_test_result': test_result
         }
         
-        # 转换 numpy 类型
+        # Convert numpy types for JSON serialization
         def convert_to_serializable(obj):
             if isinstance(obj, np.ndarray):
                 return obj.tolist()
@@ -241,13 +236,13 @@ class TrainingVisualizer:
             k: convert_to_serializable(v) for k, v in summary.items()
         }
         
-        # save为 JSON（覆盖旧文件，只保留全局最佳）
+        # Save as JSON (overwrite old file, keep only global best)
         save_path = os.path.join(self.save_dir, f'{self.config["model"]}_{self.config["dataset"]}_best_summary.json')
         with open(save_path, 'w', encoding='utf-8') as f:
             json.dump(serializable_summary, f, indent=2, ensure_ascii=False)
     
     def plot_all(self):
-        """绘制最佳结果图表"""
+        """Generate best results visualization charts"""
         if not self.enabled:
             return
         

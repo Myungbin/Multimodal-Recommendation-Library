@@ -1,20 +1,25 @@
+# coding: utf-8
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 import torch
 
 
 def samples_gen(user_rep, item_rep, k):
-    # 假设 user_rep 和 item_rep 已经定义并且是正确的维度
+    # Assume user_rep and item_rep are already defined with correct dimensions
     # user_rep: (A, 128), item_rep: (B, 128)
 
-    # 步骤1: 标准化向量
+    # Step 1: Normalize vectors
     user_rep = user_rep / user_rep.norm(dim=1, keepdim=True)
     item_rep = item_rep / item_rep.norm(dim=1, keepdim=True)
 
-    # 步骤2: compute余弦相似度矩阵
-    pos_similarity_matrix = torch.mm(user_rep, item_rep.t())  # 结果维度为 (A, B)
+    # Step 2: Compute cosine similarity matrix
+    pos_similarity_matrix = torch.mm(user_rep, item_rep.t())  # Output shape: (A, B)
     neg_similarity_matrix = -pos_similarity_matrix
-    # 步骤3: 对每个用户找到最相似的k个项目的位置
+    
+    # Step 3: Find the positions of the top-k most similar items for each user
     _, top_k_pos_indices = torch.topk(pos_similarity_matrix, k=k, dim=1)
     _, top_k_neg_indices = torch.topk(neg_similarity_matrix, k=k, dim=1)
 
-    # top_k_indices 就是每个用户最相似的k个项目的位置，维度为 (A, k)
+    # top_k_pos_indices: positions of top-k positive samples for each user, shape (A, k)
+    # top_k_neg_indices: positions of top-k negative samples for each user, shape (A, k)
     return top_k_pos_indices, top_k_neg_indices

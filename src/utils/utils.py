@@ -1,10 +1,5 @@
 # coding: utf-8
-# @email  : enoche.chow@gmail.com
-
-"""
-Utility functions
-##########################
-"""
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
 
 import numpy as np
 import torch

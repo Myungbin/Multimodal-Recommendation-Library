@@ -1,4 +1,6 @@
-# MRS Framework - DualGNN Model Configuration
+# coding: utf-8
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 embedding_size: 64
 k: [40]
 aggr_mode: 'mean'

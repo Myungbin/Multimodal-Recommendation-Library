@@ -1,9 +1,5 @@
 # coding: utf-8
-# @email: enoche.chow@gmail.com
-"""
-MRS 版本：移除 Mirror Gradient 和 MDVT
-保持简洁的训练器
-"""
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
 
 import os
 import itertools
@@ -22,12 +18,8 @@ from utils.visualization import TrainingVisualizer
 
 
 class AbstractTrainer(object):
-    """训练器基类"""
+    """Base trainer class"""
     
-    def __init__(self, config, model):
-        self.config = config
-        self.model = model
-
     def fit(self, train_data):
         raise NotImplementedError()
 
@@ -36,7 +28,7 @@ class AbstractTrainer(object):
 
 
 class Trainer(AbstractTrainer):
-    """基础训练器 - 移除了 Mirror Gradient 和 MDVT"""
+    """Basic trainer - Mirror Gradient and MDVT removed"""
     
     def __init__(self, config, model):
         super(Trainer, self).__init__(config, model)
@@ -53,7 +45,7 @@ class Trainer(AbstractTrainer):
         self.test_batch_size = config['eval_batch_size']
         self.device = config['device']
         
-        # 权重衰减
+        # Weight decay
         self.weight_decay = 0.0
         if config.get('weight_decay') is not None:
             wd = config['weight_decay']
@@ -63,7 +55,7 @@ class Trainer(AbstractTrainer):
         self.start_epoch = 0
         self.cur_step = 0
 
-        # initialize最佳结果
+        # Initialize best results
         tmp_dd = {}
         for j, k in list(itertools.product(config['metrics'], config['topk'])):
             tmp_dd[f'{j.lower()}@{k}'] = 0.0
@@ -72,24 +64,24 @@ class Trainer(AbstractTrainer):
         self.best_test_upon_valid = tmp_dd
         self.train_loss_dict = dict()
         
-        # 优化器
+        # Optimizer
         self.optimizer = self._build_optimizer()
 
-        # 学习率调度器
+        # Learning rate scheduler
         lr_scheduler = config.get('learning_rate_scheduler', [1.0, 50])
         fac = lambda epoch: lr_scheduler[0] ** (epoch / lr_scheduler[1])
         scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lr_lambda=fac)
         self.lr_scheduler = scheduler
 
-        # 评估器
+        # Evaluator
         self.eval_type = config.get('eval_type', 'full')
         self.evaluator = TopKEvaluator(config)
         
-        # 可视化器（save到 log/{model}/{dataset}/visualization/）
+        # Visualizer (saved to log/{model}/{dataset}/visualization/)
         self.visualizer = TrainingVisualizer(config)
 
     def _build_optimizer(self):
-        """build优化器"""
+        """Build optimizer"""
         if self.learner.lower() == 'adam':
             return optim.Adam(self.model.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
         elif self.learner.lower() == 'sgd':
@@ -103,7 +95,7 @@ class Trainer(AbstractTrainer):
             return optim.Adam(self.model.parameters(), lr=self.learning_rate)
 
     def _train_epoch(self, train_data, epoch_idx, loss_func=None):
-        """训练一个 epoch"""
+        """Train for one epoch"""
         if not self.req_training:
             return 0.0, []
             
@@ -115,7 +107,7 @@ class Trainer(AbstractTrainer):
         for batch_idx, interaction in enumerate(train_data):
             self.optimizer.zero_grad()
             
-            # compute损失
+            # Compute loss
             losses = loss_func(interaction)
             
             if isinstance(losses, tuple):
@@ -126,15 +118,15 @@ class Trainer(AbstractTrainer):
                 loss = losses
                 total_loss = losses.item() if total_loss is None else total_loss + losses.item()
             
-            # 检查 NaN
+            # Check for NaN
             if torch.isnan(loss):
                 self.logger.info(f'Loss is nan at epoch: {epoch_idx}, batch index: {batch_idx}')
                 return loss, torch.tensor(0.0)
 
-            # 反向传播（移除了 Mirror Gradient 逻辑）
+            # Backward propagation (Mirror Gradient logic removed)
             loss.backward()
             
-            # 梯度裁剪
+            # Gradient clipping
             if self.clip_grad_norm:
                 clip_grad_norm_(self.model.parameters(), **self.clip_grad_norm)
             
@@ -145,17 +137,17 @@ class Trainer(AbstractTrainer):
 
     @torch.no_grad()
     def _valid_epoch(self, valid_data):
-        """验证一个 epoch"""
+        """Validate for one epoch"""
         valid_result = self.evaluate(valid_data)
         valid_score = valid_result[self.valid_metric] if self.valid_metric else valid_result['NDCG@20']
         return valid_score, valid_result
 
     def _check_nan(self, loss):
-        """检查 NaN"""
+        """Check for NaN"""
         return torch.isnan(loss)
 
     def _generate_train_loss_output(self, epoch_idx, s_time, e_time, losses):
-        """生成训练损失output"""
+        """Generate training loss output"""
         train_loss_output = 'epoch %d training [time: %.2fs, ' % (epoch_idx, e_time - s_time)
         if isinstance(losses, tuple):
             train_loss_output = ', '.join('train_loss%d: %.4f' % (idx + 1, loss) for idx, loss in enumerate(losses))
@@ -164,9 +156,9 @@ class Trainer(AbstractTrainer):
         return train_loss_output + ']'
 
     def fit(self, train_data, valid_data=None, test_data=None, saved=False, verbose=True):
-        """训练模型"""
+        """Train the model"""
         for epoch_idx in range(self.start_epoch, self.epochs):
-            # 训练
+            # Training
             training_start_time = time()
             if hasattr(self.model, 'pre_epoch_processing'):
                 self.model.pre_epoch_processing()
@@ -180,14 +172,14 @@ class Trainer(AbstractTrainer):
             train_loss_value = sum(train_loss) if isinstance(train_loss, tuple) else train_loss
             self.train_loss_dict[epoch_idx] = train_loss_value
             
-            # 记录训练损失用于可视化
+            # Record training loss for visualization
             self.visualizer.record_loss(epoch_idx, train_loss_value)
             
             training_end_time = time()
             train_loss_output = self._generate_train_loss_output(epoch_idx, training_start_time, training_end_time, train_loss)
             
             if verbose:
-                # 美化output格式（增大 1.3 倍）
+                # Beautify output format (enlarged by 1.3x)
                 box_width = 92  # 70 * 1.3 ≈ 92
                 time_str = f"{training_end_time - training_start_time:.2f}s"
                 self.logger.info(f"╔{'═' * box_width}╗")
@@ -198,7 +190,7 @@ class Trainer(AbstractTrainer):
                     if post_info is not None:
                         self.logger.info(post_info)
 
-            # 评估
+            # Evaluation
             if (epoch_idx + 1) % self.eval_step == 0:
                 valid_start_time = time()
                 valid_score, valid_result = self._valid_epoch(valid_data)
@@ -212,11 +204,11 @@ class Trainer(AbstractTrainer):
                                      (epoch_idx, valid_end_time - valid_start_time, valid_score)
                 valid_result_output = 'valid result: \n' + dict2str(valid_result)
                 
-                # 测试
+                # Test
                 _, test_result = self._valid_epoch(test_data)
                 
                 if verbose:
-                    # 美化评估output（增大 1.3 倍）
+                    # Beautify evaluation output (enlarged by 1.3x)
                     box_width = 92  # 70 * 1.3 ≈ 92
                     time_str = f"{valid_end_time - valid_start_time:.2f}s"
                     self.logger.info(f"╔{'═' * box_width}╗")
@@ -225,7 +217,7 @@ class Trainer(AbstractTrainer):
                     self.logger.info(f"║ Test: {dict2str(test_result)}")
                     self.logger.info(f"╚{'═' * box_width}╝")
                 
-                # 记录指标用于可视化（自动更新最佳结果）
+                # Record metrics for visualization (auto-update best results)
                 self.visualizer.record_metrics(epoch_idx, valid_result, test_result)
                 
                 if update_flag:
@@ -245,14 +237,14 @@ class Trainer(AbstractTrainer):
                         self.logger.info(stop_output)
                     break
         
-        # 生成最佳结果的可视化图表
+        # Generate visualization charts for best results
         self.visualizer.plot_all()
         
         return self.best_valid_score, self.best_valid_result, self.best_test_upon_valid
 
     @torch.no_grad()
     def evaluate(self, eval_data, is_test=False, idx=0):
-        """评估模型"""
+        """Evaluate the model"""
         self.model.eval()
         batch_matrix_list = []
         
@@ -260,17 +252,17 @@ class Trainer(AbstractTrainer):
             scores = self.model.full_sort_predict(batched_data)
             masked_items = batched_data[1]
             
-            # 掩码正样本
+            # Mask positive samples
             scores[masked_items[0], masked_items[1]] = -1e10
             
-            # 获取 top-k
+            # Get top-k
             _, topk_index = torch.topk(scores, max(self.config['topk']), dim=-1)
             batch_matrix_list.append(topk_index)
         
         return self.evaluator.evaluate(batch_matrix_list, eval_data, is_test=is_test, idx=idx)
 
     def plot_train_loss(self, show=True, save_path=None):
-        """绘制训练损失曲线"""
+        """Plot training loss curve"""
         epochs = list(self.train_loss_dict.keys())
         epochs.sort()
         values = [float(self.train_loss_dict[epoch]) for epoch in epochs]

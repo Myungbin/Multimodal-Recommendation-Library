@@ -1,5 +1,6 @@
-# MRS Framework - LOBSTER Model Configuration
-# Aligned with MMRec-tmp's LOBSTER
+# coding: utf-8
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 embedding_size: 64
 reg_weight: [1e-01, 1e-02, 1e-03, 1e-04]
 dropout: [0.0, 0.1, 0.2, 0.3]

@@ -1,4 +1,6 @@
-# MRS Framework - GRCN Model Configuration
+# coding: utf-8
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 embedding_size: 64
 latent_embedding: 16
 n_layers: [2, 3]

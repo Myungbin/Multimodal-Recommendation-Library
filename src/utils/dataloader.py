@@ -1,9 +1,6 @@
 # coding: utf-8
-# @email: enoche.chow@gmail.com
-"""
-Wrap dataset into dataloader
-################################################
-"""
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 import math
 import torch
 import random

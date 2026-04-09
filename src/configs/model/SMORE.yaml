@@ -1,3 +1,6 @@
+# coding: utf-8
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 embedding_size: 64
 n_ui_layers: [3,4]
 n_layers: 1

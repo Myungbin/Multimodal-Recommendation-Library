@@ -1,3 +1,6 @@
+# coding: utf-8
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 import torch
 import random
 import torchvision.transforms as transforms

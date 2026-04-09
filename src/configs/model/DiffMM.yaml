@@ -1,5 +1,6 @@
-# MRS Framework - DiffMM Model Configuration
-# Aligned with ChaoRec
+# coding: utf-8
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 embedding_size: 64
 feat_embed_dim: 64
 n_layers: 2

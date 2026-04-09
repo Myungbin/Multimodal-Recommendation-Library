@@ -1,6 +1,5 @@
 # coding: utf-8
-# @email  : enoche.chow@gmail.com
-
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
 
 import torch
 import torch.nn as nn

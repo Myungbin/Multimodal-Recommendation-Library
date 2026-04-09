@@ -1,8 +1,5 @@
 # coding: utf-8
-"""
-MRS 版本：移除 Mirror Gradient 和 MDVT configuration
-保持简单！
-"""
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
 
 import re
 import os
@@ -12,16 +9,16 @@ from logging import getLogger
 
 
 class Config(object):
-    """configuration器 - 简化版"""
+    """Configuration manager - simplified version"""
     
     def __init__(self, model=None, dataset=None, config_dict=None):
         """
-        initializeconfiguration器
+        Initialize configuration manager
         
         Args:
             model: Model name
             dataset: Dataset name
-            config_dict: configuration字典
+            config_dict: Configuration dictionary
         """
         if config_dict is None:
             config_dict = {}
@@ -29,24 +26,24 @@ class Config(object):
         config_dict['model'] = model
         config_dict['dataset'] = dataset
         
-        # loadconfiguration文件
+        # Load configuration files
         self.final_config_dict = self._load_config_files(config_dict)
         
-        # 更新代码中的configuration（优先级最高）
+        # Update with runtime configuration (highest priority)
         self.final_config_dict.update(config_dict)
         
-        # 设置defaultparameter
+        # Set default parameters
         self._set_default_parameters()
         
-        # initialize设备
+        # Initialize device
         self._init_device()
     
     def _load_config_files(self, config_dict):
-        """loadconfiguration文件"""
+        """Load configuration files"""
         file_config_dict = {}
         file_list = []
         
-        # configuration层次：overall -> dataset -> model
+        # Configuration hierarchy: overall -> dataset -> model
         cur_dir = os.getcwd()
         configs_dir = os.path.join(cur_dir, 'configs')
         
@@ -64,14 +61,14 @@ class Config(object):
                         hyper_parameters.extend(fdata['hyper_parameters'])
                     file_config_dict.update(fdata)
             else:
-                # configuration文件不存在时不报错，继续运行
+                # Continue running if configuration file does not exist
                 pass
         
         file_config_dict['hyper_parameters'] = hyper_parameters
         return file_config_dict
     
     def _build_yaml_loader(self):
-        """build YAML load器"""
+        """Build YAML loader"""
         loader = yaml.FullLoader
         loader.add_implicit_resolver(
             u'tag:yaml.org,2002:float',
@@ -86,17 +83,17 @@ class Config(object):
         return loader
     
     def _set_default_parameters(self):
-        """设置defaultparameter"""
+        """Set default parameters"""
         smaller_metric = ['rmse', 'mae', 'logloss']
         valid_metric = self.final_config_dict['valid_metric'].split('@')[0]
         self.final_config_dict['valid_metric_bigger'] = False if valid_metric in smaller_metric else True
         
-        # 如果 seed 不在超parameter列表中，添加它
+        # Add seed to hyper_parameters if not already present
         if "seed" not in self.final_config_dict['hyper_parameters']:
             self.final_config_dict['hyper_parameters'] += ['seed']
     
     def _init_device(self):
-        """initialize设备"""
+        """Initialize device"""
         use_gpu = self.final_config_dict.get('use_gpu', True)
         if use_gpu:
             os.environ["CUDA_VISIBLE_DEVICES"] = str(self.final_config_dict.get('gpu_id', 0))
@@ -119,11 +116,11 @@ class Config(object):
         return key in self.final_config_dict
     
     def get(self, key, default=None):
-        """获取configuration值"""
+        """Get configuration value"""
         return self.final_config_dict.get(key, default)
     
     def __str__(self):
-        """configuration信息字符串"""
+        """Configuration information as string"""
         args_info = '\n'
         args_info += '\n'.join(["{}={}".format(arg, value) for arg, value in self.final_config_dict.items()])
         args_info += '\n\n'

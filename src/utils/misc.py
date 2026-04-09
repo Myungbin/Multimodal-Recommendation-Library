@@ -1,8 +1,6 @@
 # coding: utf-8
-# @email: enoche.chow@gmail.com
-"""
-modified from UNITER
-"""
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 import json
 import random
 import sys

@@ -1,8 +1,5 @@
-# encoding: utf-8
-# @email: enoche.chow@gmail.com
-"""
-############################
-"""
+# coding: utf-8
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
 
 from logging import getLogger
 

@@ -1,3 +1,6 @@
+# coding: utf-8
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 import copy
 import math
 

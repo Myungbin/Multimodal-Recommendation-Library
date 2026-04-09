@@ -1,4 +1,6 @@
-# MRS Framework - MMSSL Model Configuration
+# coding: utf-8
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 embedding_size: 64
 mmlayer: [2, 3]
 ssl_temp: [0.2, 0.4, 0.6]

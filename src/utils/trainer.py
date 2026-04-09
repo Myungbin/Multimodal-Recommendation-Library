@@ -1,8 +1,5 @@
 # coding: utf-8
-"""
-MRS Framework - Trainer
-训练器模块（移除了 Mirror Gradient 和 MDVT）
-"""
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
 
 import torch
 import torch.optim as optim
@@ -16,13 +13,9 @@ from utils.utils import early_stopping, dict2str
 
 class MRSTrainer:
     """
-    MRS 训练器
-    
-    改进点：
-    1. 移除了 Mirror Gradient 和 MDVT 相关逻辑
-    2. 更简洁的训练循环
-    3. 更好的日志记录
-    4. 支持早停
+    1. More concise training loop
+    2. Better logging
+    3. Early stopping support
     """
     
     def __init__(self, config, model):
@@ -30,7 +23,7 @@ class MRSTrainer:
         self.model = model
         self.logger = getLogger()
         
-        # 训练configuration
+        # Training configuration
         self.learner = config['learner']
         self.learning_rate = config['learning_rate']
         self.epochs = config['epochs']
@@ -38,27 +31,27 @@ class MRSTrainer:
         self.stopping_step = config['stopping_step']
         self.clip_grad_norm = config.get('clip_grad_norm', None)
         
-        # 评估configuration
+        # Evaluation configuration
         self.valid_metric = config['valid_metric'].lower()
         self.valid_metric_bigger = config['valid_metric_bigger']
         self.device = config['device']
         
-        # 优化器
+        # Optimizer
         self.optimizer = self._build_optimizer()
         
-        # 学习率调度器
+        # Learning rate scheduler
         lr_scheduler = config.get('learning_rate_scheduler', [1.0, 50])
         fac = lambda epoch: lr_scheduler[0] ** (epoch / lr_scheduler[1])
         self.lr_scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lr_lambda=fac)
         
-        # 早停configuration
+        # Early stopping configuration
         self.best_valid_score = -1
         self.cur_step = 0
         self.best_valid_result = {}
         self.best_test_upon_valid = {}
         
     def _build_optimizer(self) -> optim.Optimizer:
-        """build优化器"""
+        """Build optimizer"""
         weight_decay = self.config.get('weight_decay', 0.0)
         
         if self.learner.lower() == 'adam':
@@ -75,14 +68,14 @@ class MRSTrainer:
     
     def _train_epoch(self, train_data, epoch_idx: int) -> float:
         """
-        训练一个 epoch
+        Train for one epoch
         
         Args:
-            train_data: 训练Data loading器
-            epoch_idx: 当前 epoch 索引
+            train_data: Training data loader
+            epoch_idx: Current epoch index
             
         Returns:
-            平均损失
+            Average loss
         """
         self.model.train()
         total_loss = 0.0
@@ -91,24 +84,24 @@ class MRSTrainer:
         for batch_idx, interactions in enumerate(train_data):
             self.optimizer.zero_grad()
             
-            # compute损失
+            # Compute loss
             losses = self.model.calculate_loss(interactions)
             
-            # 支持多损失
+            # Support multiple losses
             if isinstance(losses, tuple):
                 loss = sum(losses)
             else:
                 loss = losses
             
-            # 检查 NaN
+            # Check for NaN
             if torch.isnan(loss):
                 self.logger.warning(f"Loss is NaN at epoch {epoch_idx}, batch {batch_idx}")
                 return float('nan')
             
-            # 反向传播
+            # Backward propagation
             loss.backward()
             
-            # 梯度裁剪
+            # Gradient clipping
             if self.clip_grad_norm:
                 clip_grad_norm_(self.model.parameters(), **self.clip_grad_norm)
             
@@ -117,35 +110,35 @@ class MRSTrainer:
             total_loss += loss.item()
             n_batches += 1
         
-        # 更新学习率
+        # Update learning rate
         self.lr_scheduler.step()
         
         return total_loss / n_batches if n_batches > 0 else 0.0
     
     @torch.no_grad()
     def _evaluate(self, eval_data) -> Dict[str, float]:
-        """评估模型"""
+        """Evaluate model"""
         self.model.eval()
         
-        # 这里应该调用 evaluator，简化处理
-        # 实际实现需要完整的评估逻辑
+        # Should call evaluator here, simplified for now
+        # Actual implementation requires complete evaluation logic
         return {}
     
     def fit(self, train_data, valid_data=None, test_data=None, verbose=True) -> Tuple[float, Dict, Dict]:
         """
-        训练模型
+        Train the model
         
         Args:
-            train_data: 训练数据
-            valid_data: 验证数据
-            test_data: 测试数据
-            verbose: 是否打印日志
+            train_data: Training data
+            valid_data: Validation data
+            test_data: Test data
+            verbose: Whether to print logs
             
         Returns:
             (best_valid_score, best_valid_result, best_test_upon_valid)
         """
         for epoch_idx in range(self.epochs):
-            # 训练
+            # Training
             training_start = time()
             self.model.pre_epoch_processing() if hasattr(self.model, 'pre_epoch_processing') else None
             
@@ -161,13 +154,13 @@ class MRSTrainer:
                 self.logger.info(f"Epoch {epoch_idx}: train_loss={train_loss:.4f}, "
                                f"time={training_end - training_start:.2f}s")
             
-            # 评估
+            # Evaluation
             if (epoch_idx + 1) % self.eval_step == 0 and valid_data is not None:
                 valid_start = time()
                 valid_score, valid_result = self._evaluate(valid_data)
                 valid_end = time()
                 
-                # 早停检查
+                # Early stopping check
                 _, _, stop_flag, update_flag = early_stopping(
                     valid_score, 
                     self.best_valid_score, 

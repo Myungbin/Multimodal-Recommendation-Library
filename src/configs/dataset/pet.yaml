@@ -1,4 +1,6 @@
-# MRS Framework - Pet Dataset Configuration
+# coding: utf-8
+# @email: jinfeng.xu0605@gmail.com / jinfeng@connect.hku.hk
+
 USER_ID_FIELD: userID
 ITEM_ID_FIELD: itemID
 TIME_FIELD: timestamp
