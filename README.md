@@ -1,3 +1,7 @@
+<div align="center">
+  <a href="https://github.com/Jinfeng-Xu/Multimodal-Recommendation-Librarys"><img width="300px" height="auto" src="images/logo.png"></a>
+</div>
+
 # MRLib: Multimodal Recommendation Library
 
  **MRLib** is an open-source, research-oriented library for multimodal recommendation.
@@ -32,7 +36,7 @@
 
 ### 📚 Extensive Dataset Support
 - **Amazon Datasets**: Baby, Sports, Clothing, Pet, Office, Toys, and etc.
-- **Video Datasets**: Tiktok and Microlens
+- **Video Datasets**: TikTok and Microlens
 - **Custom Datasets**: Clear format specifications
 
 ---
@@ -74,11 +78,8 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/your-repo/MRS.git
-cd MRS
-
-# Install dependencies
-pip install -r requirements.txt
+git clone https://github.com/Jinfeng-Xu/Multimodal-Recommendation-Library
+cd Multimodal-Recommendation-Library
 ```
 
 ### Basic Usage
