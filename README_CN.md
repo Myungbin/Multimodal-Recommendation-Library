@@ -33,7 +33,7 @@ MRLib 是一个面向科研的开源多模态推荐系统（Multimodal Recommend
 - **社区驱动**：开放贡献通道，欢迎学术界与工业界开发者共同建设
 
 📚 **丰富的数据集支持 (Extensive Dataset Support)**
-- **Amazon 系列**：Baby, Sports, Clothing, Pet, Office, Toys 等
+- **Amazon 系列**：Baby, Sports, Clothing, Pet, Office, Toys, Beauty 等
 - **视频/短视频系列**：TikTok, Microlens
 - **自定义数据集**：提供清晰的数据格式规范，轻松接入私有数据
 
@@ -171,6 +171,7 @@ MRLib/
 ### 评估指标配置
 默认评估指标为 `Recall@N` 和 `NDCG@N`（N = 10, 20）。  
 完整支持的指标与 Top-K 设置包括：
+
 - **指标**：Recall, NDCG, Precision, MAP
 - **K值**：@5, @10, @20, @50
 

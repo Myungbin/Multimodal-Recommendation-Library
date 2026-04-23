@@ -34,7 +34,7 @@
 - **Community Driven**: Welcoming contributions
 
 ### 📚 Extensive Dataset Support
-- **Amazon Datasets**: Baby, Sports, Clothing, Pet, Office, Toys, and etc.
+- **Amazon Datasets**: Baby, Sports, Clothing, Pet, Office, Toys, Beauty and etc.
 - **Video Datasets**: TikTok and Microlens
 - **Custom Datasets**: Clear format specifications
 
